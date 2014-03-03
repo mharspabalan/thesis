@@ -1,0 +1,83 @@
+﻿@using RCCW.Models;
+@model AdminViewModel
+@{
+    ViewBag.Title = "Index";
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".table").dataTable();
+    });
+</script>
+<div class="blog-masthead">
+      <div class="container">
+        <nav class="blog-nav">
+          <a class="blog-nav-item " href="/Home/Index" >Home</a>
+          <a class="blog-nav-item active" href="/Admin/Index">User Admin</a>
+           @Html.ActionLink("Logout", "Logout", "Login",null, new { @class = "blog-nav-item"})
+        </nav>
+     
+      </div>
+    </div>
+<div class="container">
+    <div class="alert alert-success">@ViewData["Success"]</div>
+      <div class="blog-header">
+        <h1 class="blog-title">RCCW Admin Panel</h1>
+        <p class="lead blog-description">Manage Wireless User and Admin User</p>
+      </div>
+
+      <div class="row">
+
+        <div class="col-sm-12 blog-main">
+
+          <div class="blog-post">
+            <h2 class="blog-post-title">Admin User</h2>
+         
+              <div class="panel panel-default">
+                      <!-- Default panel contents -->
+                      <div class="panel-heading">List Of Admin User <a title="Register Admin" href="#" data-toggle="modal" data-target="#myModal"><span class="glyphicon glyphicon-plus"></span></a></div>
+                      <div class="panel-body">
+                        <div class="alert alert-info">You can search a user then click an action icon right after the name of the admin</div>
+                      </div>
+
+                      <!-- Table -->
+                      <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                 <th>Username</th>
+                                 <th>Lastname</th>
+                                 <th>Firstname</th>
+                                  <th>Edit</th>
+                                  <th>Delete</th>
+                            </tr>
+                        </thead>
+                          <tbody>
+                              @foreach (var item in Model.Users)
+                              {
+                                  <tr>
+                                  <td>
+                                      @item.Id
+                                  </td>
+                                  <td>@item.Username</td>
+                                  <td>@item.Lastname</td>
+                                  <td>@item.Firstname</td>
+                                  <td><a href="#" class="edit-admin" title="Update User"><span class="glyphicon glyphicon-pencil"></span></a></td>
+                                  <td><a href="/Admin/DeleteUser?id=@item.Id" onclick="return confirm('Are you sure you want to delete?');" title="Remove User"><span class="glyphicon glyphicon-trash"></span></a></td>
+                                 </tr>
+                              }
+                             
+                          </tbody>
+                      </table>
+                    </div>
+
+          </div><!-- /.blog-post -->
+
+ 
+
+        </div><!-- /.blog-main -->
+
+   
+
+      </div><!-- /.row -->
+
+    </div>

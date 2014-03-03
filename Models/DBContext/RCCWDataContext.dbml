@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?><Database Name="RCCWDB" Class="RCCWDataContextDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Connection Mode="WebSettings" ConnectionString="Data Source=ADMIN-PC;Initial Catalog=RCCWDB;User ID=sa" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="RCCWDBConnectionString1" Provider="System.Data.SqlClient" />
+  <Table Name="dbo.tbl_User" Member="tbl_Users">
+    <Type Name="tbl_User">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Username" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="Password" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="Lastname" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="Firstname" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.tbl_WifiUser" Member="tbl_WifiUsers">
+    <Type Name="tbl_WifiUser">
+      <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="StudentId" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="Lastname" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="Firstname" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="MI" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="Course" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="Gender" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="MacAddress" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="LoadAmount" Type="System.Int32" DbType="Int" CanBeNull="true" />
+    </Type>
+  </Table>
+</Database>

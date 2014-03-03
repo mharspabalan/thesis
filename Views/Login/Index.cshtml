@@ -1,0 +1,22 @@
+﻿@using RCCW.Models;
+@model LoginModel
+@{
+    ViewBag.Title = "Index";
+}
+
+
+<div class="container">
+    @if(@ViewBag.Failed != null) {
+    <div class="alert alert-danger">@ViewBag.Failed</div>
+    }
+      <form action="@Url.Action("Login","Login")" method="post" class="form-signin" role="form">
+        <h2 class="form-signin-heading">RCCW Admin Log In</h2>
+        <input type="text" name="Username" class="form-control" placeholder="Username" required="" autofocus="">
+        <input type="password" name="Password" class="form-control" placeholder="Password" required="">
+        <label class="checkbox">
+          <input type="checkbox" value="remember-me"> Remember me
+        </label>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Log Me In</button>
+      </form>
+
+    </div>

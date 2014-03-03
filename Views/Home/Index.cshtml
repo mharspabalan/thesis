@@ -1,0 +1,310 @@
+﻿@using RCCW.Models;
+@model WifiUserViewModel
+
+@{
+    ViewBag.Title = "Index";
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".table").dataTable();
+
+        $(document).on("submit", "#form-register-wifi-user", function () {
+            debugger;
+            var f = $(this);
+
+            //var g = f.find(':radio[name=rdoGender]:checked').val();
+
+            var studentid = f.find('#inputstudentId').val();
+            var lastname = f.find('#inputLastname').val();
+            var firstname = f.find('#inputFirstname').val();
+            var mi = f.find('#inputMI').val();
+            var gender = f.find(':radio[name=rdoGender]:checked').val();
+            var course = f.find('#inputCourse').val();
+            var mac = f.find('#inputMacAddress').val();
+            $.ajax({
+                url:'/Home/RegisterUser',
+                method: "POST",
+                data: { StudentId: studentid,Lastname:lastname,Firstname:firstname,MI:mi,Gender:gender,Course:course,MacAddress:mac },
+                success: function (data) {
+                    if (data.result) {
+                        $('.modal').modal('hide');
+                        alert('Save success!');
+                        window.location = "/Home/Index";
+                    }
+                },
+                error: function () {
+                    alert('Process timeout.');
+                }
+            });
+
+            return false;
+        });
+
+        $(document).on('click', '.edit-user', function () {
+            debugger;
+            var studentid = $(this).parents('td').parents('tr').find('td:first').text();
+            $.ajax({
+                url: '/Home/Edit?id=' + studentid,
+                success: function (data) {
+
+                    if (data.model != null) {
+                        var m = data.model;
+                        var f = $("#form-register-wifi-user");
+
+
+                        f.find('#inputstudentId').val(m.StudentId);
+
+                        f.find('#inputstudentId').attr('disabled', 'disabled');
+
+                        f.find('#inputLastname').val(m.Lastname);
+                        f.find('#inputFirstname').val(m.Firstname);
+                        f.find('#inputMI').val(m.MI);
+                        f.find(':radio[name=rdoGender]:checked').val(m.Gender);
+                        f.find('#inputCourse').val(m.Course);
+                        f.find('#inputMacAddress').val(m.MacAddress);
+
+                        $('#myModal').modal('show');
+                    }
+                },
+             
+                error: function () {
+                    alert('Process Timeout');
+                }
+            });
+            return false;
+        });
+
+        $('#myModal').on('hidden.bs.modal', function () {
+            $(this).find('form').find('input[name!=rdoGender]').each(function () {
+                $(this).val('');
+            });
+        })
+
+        $(document).on('click', '.reload-card', function () {
+            var studentid = $(this).parents('td').parents('tr').find('td:first').text();
+            $('#reload-student-id').val(studentid);
+            $("#myModal2").modal('show');
+            return false;
+        });
+
+        $(document).on('click', '#myModal2 button[name!=close]', function () {
+            if (confirm('Are you sure you want to reload ' + $(this).text() + '?')) {
+                var id = $('#reload-student-id').val();
+                var val = $(this).text();
+
+                $.ajax({
+                    url: '/Home/Reload',
+                    method: "POST",
+                    data: { id: id, amount: val },
+                    success: function (data) {
+                        if (data.result) {
+                            alert('Reload success.');
+                        } else {
+                            alert('Reload failed.');
+                        }
+                    },
+                    error: function () {
+                        alert('Process Timeout');
+                    }
+                });
+            }
+        });
+    });
+
+</script>
+<div class="blog-masthead">
+      <div class="container">
+        <nav class="blog-nav">
+          <a class="blog-nav-item active" href="/Home/Index">Home</a>
+          <a class="blog-nav-item" href="/Admin/Index">User Admin</a>
+           @Html.ActionLink("Logout", "Logout", "Login",null, new { @class = "blog-nav-item"})
+        </nav>
+     
+      </div>
+    </div>
+<div class="container">
+    <div class="alert alert-success">@ViewData["Success"]</div>
+      <div class="blog-header">
+        <h1 class="blog-title">RCCW Admin Panel</h1>
+        <p class="lead blog-description">Manage Wireless User and Admin User</p>
+      </div>
+
+      <div class="row">
+
+        <div class="col-sm-12 blog-main">
+
+          <div class="blog-post">
+            <h2 class="blog-post-title">Wireless User</h2>
+         
+              <div class="panel panel-default">
+                      <!-- Default panel contents -->
+                      <div class="panel-heading">List Of Wireless User <a title="Register Wireless User" href="#" data-toggle="modal" data-target="#myModal"><span class="glyphicon glyphicon-plus"></span></a></div>
+                      <div class="panel-body">
+                        <div class="alert alert-info">You can search a user then click an action icon right after the name of the student</div>
+                      </div>
+
+                      <!-- Table -->
+                      <table class="table">
+                        <thead>
+                            <tr>
+                                <th>StudentID</th>
+                                 <th>Lastname</th>
+                                 <th>Firstname</th>
+                                 <th>Middlename</th>
+                                 <th>Print</th>
+                                  <th>Reload</th>
+                                  <th>Edit</th>
+                                  <th>Delete</th>
+                            </tr>
+                        </thead>
+                          <tbody>
+                              @foreach (var item in Model.WifiUsers)
+                              {
+                                  <tr>
+                                  <td>
+                                      @item.StudentId
+                                  </td>
+                                  <td>@item.Lastname</td>
+                                  <td>@item.Firstname</td>
+                                  <td>@item.MI</td>
+                                  <td class="action"><a target="_blank" href="/QuickPrint?id=@item.StudentId" title="Print Card"><span class="glyphicon glyphicon-qrcode"></span></a></td>
+                                  <td><a href="#" title="Load Card"class="reload-card"><span class="glyphicon glyphicon-credit-card"></span></a></td>
+                                    <td><a href="#" class="edit-user" title="Update User"><span class="glyphicon glyphicon-pencil"></span></a></td>
+                                  <td><a href="/Home/DeleteUser?id=@item.StudentId" onclick="return confirm('Are you sure you want to delete?');" title="Remove User"><span class="glyphicon glyphicon-trash"></span></a></td>
+                                 </tr>
+                              }
+                             
+                          </tbody>
+                      </table>
+                    </div>
+
+          </div><!-- /.blog-post -->
+
+ 
+
+        </div><!-- /.blog-main -->
+
+   
+
+      </div><!-- /.row -->
+
+    </div>
+
+<div class="blog-footer">
+      <p>Copyright 2013 RCCW-NCST</p>
+      <p>
+        <a href="#">Back to top</a>
+      </p>
+    </div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="myModalLabel">Student Entry</h4>
+      </div>
+      <div class="modal-body">
+            <form id="form-register-wifi-user" action="@Url.Action("RegisterUser","Home")" class="form-horizontal" role="form">
+                  <div class="form-group">
+                    <label for="inputstudentId"  class="col-sm-2 control-label">Student No</label>
+                    <div class="col-sm-10">
+                      <input type="text" maxlength="9" pattern="\d*" name="StudentId" required="" class="form-control" id="inputstudentId" placeholder="Student No">
+                       @* @Html.TextBoxFor(WifiUser => WifiUser.WifiUser.StudentId, new {required="", @class="form-control", @id="inputStudentNo", @placeholder="Student No" })*@
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="inputLastname" class="col-sm-2 control-label">Lastname</label>
+                    <div class="col-sm-10">
+                      <input type="text" name="Lastname" required="" class="form-control" id="inputLastname" placeholder="Lastname">
+                      
+                    </div>
+                  </div>
+                   <div class="form-group">
+                    <label for="inputFirstname" class="col-sm-2 control-label">Firstname</label>
+                    <div class="col-sm-10">
+                         <input type="text" name="Firstname" required="" class="form-control" id="inputFirstname" placeholder="Firstname">
+                    </div>
+                  </div>
+                 <div class="form-group">
+                    <label for="inputMI" class="col-sm-2 control-label">M.I</label>
+                    <div class="col-sm-10">
+                         <input type="text" maxlength="1" name="MI" required="" class="form-control" id="inputMI" placeholder="Middle Initial">
+                    </div>
+                  </div>
+                 <div class="form-group">
+                    <label for="rdoGender" class="col-sm-2 control-label">Gender</label>
+                    <div class="col-sm-10">
+                        Male <input type="radio" value="Male" name="rdoGender" checked="checked" />
+                        Female <input type="radio" value="Female" name="rdoGender" />
+                    </div>
+                  </div>
+              
+                   <div class="form-group">
+                    <label for="inputCourse" class="col-sm-2 control-label">Course</label>
+                    <div class="col-sm-10">
+                        <input class="form-control" name="Course" required="" type="text" id="inputCourse" placeholder="Course" />
+                    </div>
+                  </div>
+               
+                <div class="form-group">
+                    <label for="inputMacAddress" class="col-sm-2 control-label">Mac Address</label>
+                    <div class="col-sm-10">
+                        <input class="form-control" maxlength="17" name="inputMacAddress" required="" type="text" id="inputMacAddress" placeholder="Mac Address" />
+                    </div>
+                  </div>
+                 
+                  <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                         <button id="submit-register" type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                  </div>
+            </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+    
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="myModalLabel2">Choose Desired Amount</h4>
+          <input type="hidden" id="reload-student-id" />
+      </div>
+      <div class="modal-body large-button">
+          
+           <p>
+              <button type="button" class="btn btn-primary btn-lg">1</button>
+              <button type="button" class="btn btn-default btn-lg">5</button>
+               <button type="button" class="btn btn-primary btn-lg">10</button>
+               <button type="button" class="btn btn-default btn-lg">15</button>
+               <button type="button" class="btn btn-primary btn-lg">20</button>
+            </p>
+          <p>
+              <button type="button" class="btn btn-primary btn-lg">30</button>
+              <button type="button" class="btn btn-default btn-lg">35</button>
+              <button type="button" class="btn btn-primary btn-lg">40</button>
+               <button type="button" class="btn btn-default btn-lg">45</button>
+              <button type="button" class="btn btn-primary btn-lg">50</button>
+         
+          </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" name="close" class="btn btn-default" data-dismiss="modal">Close</button>
+    
+      </div>
+    </div>
+  </div>
+</div>
